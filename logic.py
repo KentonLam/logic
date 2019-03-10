@@ -1,26 +1,38 @@
 
+def symbol(sym):
+    def symbol_wrapper(func):
+        func.symbol = sym 
+        print(func.symbol)
+        return func
+    return symbol_wrapper
+
 class Operation:
     @staticmethod
+    @symbol('')
     def NOOP(x, y):
         assert y is None
         return x
 
     @staticmethod
+    @symbol(' | ')
     def OR(x, y):
         assert None not in (x, y)
         return bool(x or y)
 
     @staticmethod
+    @symbol(' & ')
     def AND(x, y):
         assert None not in (x, y)
         return bool(x and y)
 
     @staticmethod
+    @symbol('~')
     def NOT(x, y):
         assert y is None 
         return not x
 
     @staticmethod
+    @symbol(' ^ ')
     def XOR(x, y):
         assert None not in (x, y)
         return x ^ y
@@ -67,16 +79,9 @@ class Expr:
     def __bool__(self):
         raise TypeError()
 
-    symbols = {
-            Operation.NOOP: '',
-            Operation.AND: ' & ',
-            Operation.OR: ' | ',
-            Operation.NOT: '~'
-        }
-
     def __str__(self):
         r = str(self.right) if self.right is not None else ''
-        s = self.symbols[self.op]
+        s = self.op.symbol
         l = str(self.left)
         if r:
             return '(' + l + s + r + ')'
@@ -109,4 +114,5 @@ if __name__ == "__main__":
     a, b, c, d = (variables('A B C D'))
     expr = ~a*b*(~d+~c*d) + b*(a+~a*c*d)
     print_truth_table(expr, 'ABCD')
+    print_truth_table(a ^ b, 'AB')
     print(repr(expr))
